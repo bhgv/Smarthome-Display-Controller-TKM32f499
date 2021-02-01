@@ -1,13 +1,10 @@
 /**
- * @file lv_port_disp_templ.h
+ * @file lv_demo_widgets.h
  *
  */
 
- /*Copy this file as "lv_port_disp.h" and set this value to "1" to enable content*/
-#if 1   ///0
-
-#ifndef LV_PORT_DISP_TEMPL_H
-#define LV_PORT_DISP_TEMPL_H
+#ifndef LV_DEMO_WIDGETS_H
+#define LV_DEMO_WIDGETS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl.h" ///#include "lvgl/lvgl.h"
 
 /*********************
  *      DEFINES
@@ -29,17 +25,14 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_demo_widgets(void);
 
-void lv_port_disp_init(void);////
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /*LV_PORT_DISP_TEMPL_H*/
-
-#endif /*Disable/Enable content*/
+#endif /*LV_DEMO_WIDGETS_H*/

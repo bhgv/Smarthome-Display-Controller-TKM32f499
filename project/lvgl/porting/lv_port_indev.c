@@ -10,7 +10,9 @@
  *      INCLUDES
  *********************/
 #include "lv_port_indev.h"
-#include "touch_CTP.h"                 
+#include "touch_CTP.h"
+
+#include "LCD.h"
 
 /*********************
  *      DEFINES
@@ -108,11 +110,14 @@ static void touchpad_init(void)
 //		touchpad_Config();   ///
 }
 
+
 /* Will be called by the library to read the touchpad */
 static bool touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
+
+	  //GUI_TOUCH_Measure();
 
     /*Save the pressed coordinates and the state*/
     if(touchpad_is_pressed()) {
@@ -122,11 +127,20 @@ static bool touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
         data->state = LV_INDEV_STATE_REL;
     }
 
+/*
+		char s[64];
+		snprintf(s, sizeof(s), "X = %d", last_x);
+		LCD_PutString(10, 60, s, Red, Yellow, 1);
+		snprintf(s, sizeof(s), "Y = %d", last_y);
+		LCD_PutString(10, 80, s, Red, Yellow, 1);
+*/
+		if(last_x < 0) last_x = 0;
+		if(last_y < 0) last_y = 0;
     /*Set the last pressed coordinates*/
     data->point.x = last_x;
     data->point.y = last_y;
 
-    /*Return `false` because we are not buffering and no more data to read*/
+	/*Return `false` because we are not buffering and no more data to read*/
     return false;
 }
 
@@ -147,8 +161,8 @@ static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
 {
     /*Your code comes here*/
 
-         (*x) = GUI_Value_X;      ///(*x) = 0;
-         (*y) = GUI_Value_Y;     ///(*y) = 0;
+         (*y) = /*YSIZE_PHYS - */ GUI_Value_X;      ///(*x) = 0;
+         (*x) = XSIZE_PHYS - GUI_Value_Y;     ///(*y) = 0;
 }
 
 #else /* Enable this file at the top */

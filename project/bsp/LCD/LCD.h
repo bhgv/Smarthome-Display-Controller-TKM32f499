@@ -1,8 +1,8 @@
 #include "HAL_conf.h"
 
-#define XSIZE_PHYS 854
-#define YSIZE_PHYS 480
-//extern __align(256) u32 LTDC_Buf[XSIZE_PHYS*YSIZE_PHYS];//XSIZE_PHYS*YSIZE_PHYS*2
+#define XSIZE_PHYS 480
+#define YSIZE_PHYS 854
+extern __align(256) u32 LTDC_Buf[XSIZE_PHYS*YSIZE_PHYS*2];//XSIZE_PHYS*YSIZE_PHYS*2
 #define LCD_SPI_CS(a)	\
 						if (a)	\
 						GPIOB->BSRR = GPIO_Pin_11;	\
@@ -25,10 +25,10 @@
 						else		\
 						GPIOD->BRR  = GPIO_Pin_6;
 
-#define Lcd_Light_ON   GPIOD->BSRR = GPIO_Pin_8  //PD8为高电平 背光打开
-#define Lcd_Light_OFF  GPIOD->BRR  = GPIO_Pin_8  //PD8为低电平 背光关闭
+#define Lcd_Light_ON   GPIOD->BSRR = GPIO_Pin_8  //PD8???? ????
+#define Lcd_Light_OFF  GPIOD->BRR  = GPIO_Pin_8  //PD8???? ????
 
-//*************  24位色（1600万色）定义 *************//
+//*************  24??(1600??)?? *************//
 #define White          0xFFFFFF
 #define Black          0x000000
 #define Blue           0x0000FF
@@ -39,7 +39,7 @@
 #define Cyan           0x00FFFF
 #define Yellow         0xFFFF00						
 
-//*************  16位色定义 *************//
+//*************  16???? *************//
 //#define White          0xFFFF
 //#define Black          0x0000
 //#define Blue           0x001F
@@ -52,8 +52,9 @@
 						
 						
 void TK80_DMA_Init(u32 srcAdd ,u32 len);
-void LCD_Initial(void); //LCD初始化函数
-void LCD_delay(int time);
+void LCD_Initial(void);
+void Lcd_Initialize(void); //LCD?????
+void LCD_delay(volatile int time);
 void WriteComm(unsigned char CMD);
 void WriteData(u32 dat);
 void LCD_WR_REG(u16 Index,u16 CongfigTemp);

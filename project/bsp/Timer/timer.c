@@ -68,10 +68,10 @@ void TIM3_IRQHandler(void)   //TIM3??
 		{	
 				lv_tick_inc(1);
 //			if ((GPIOB->IDR & GPIO_Pin_3) == 0)if(touch_time%50==0)I2C1->IC_DATA_CMD = 0x01;
-			if(touch_time%50==1)
+			if((touch_time & 7) == 1)
 			{
 //				if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_3)==0)GUI_TOUCH_Measure();
-				if ((GPIOB->IDR & GPIO_Pin_3) == 0)GUI_TOUCH_Measure();
+				if ((GPIOB->IDR & GPIO_Pin_3) == 0) GUI_TOUCH_Measure();
 				else touchInfo_flag = 0;//´¥ÃþÎÞÐ§
 			}
 			touch_time++;

@@ -4,7 +4,10 @@
 #include "lv_conf.h"
 #include "lv_port_disp.h"  ///
 #include "lv_port_indev.h" ///
-#include "reflow_oven_ui.h"
+
+//#include "reflow_oven_ui.h"
+#include "lv_demo_widgets.h"
+
 
 //分配启动任务优先级、堆栈大小、任务堆栈
 #define START_TASK_PRIO		(configMAX_PRIORITIES-1)        //任务优先级
@@ -42,7 +45,7 @@ void LED_Task(void *pvParameters)
 	{
 		//GPIOD->ODR ^= GPIO_Pin_8;//取反PD8，令LED灯闪动
 		lv_task_handler();
-		vTaskDelay(5);        //延时1s
+		vTaskDelay(2);        //延时1s
 	}
 }
 //启动任务
@@ -70,17 +73,30 @@ void Start_Task(void *pvParameters)
 int main(void)
 {
 RemapVtorTable();
-	SystemClk_HSEInit(RCC_PLLMul_25);//启动PLL时钟，12MHz*20=240MHz，25超频慎用
+//	SystemClk_HSEInit(RCC_PLLMul_25);//启动PLL时钟，12MHz*20=240MHz，25超频慎用
+	SystemClk_HSEInit(RCC_PLLMul_20);//启动PLL时钟，12MHz*20=240MHz，25超频慎用
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//2：2，全局性函数，仅需设置一次
-	UartInit(UART2, 115200);      //配置串口1，波特率为460800
+	UartInit(UART1, 115200);      //配置串口1，波特率为460800
 	printf("Hello \n");
 		
 	TIM8_Config(240,1000);        //配置定时器8，在定时器中断里打印
+//	TIM3_Config(1000,240);//1mS
+
+//	TIM8_Config(1000,24000);        //配置定时器8，在定时器中断里打印
 	TIM3_Config(1000,240);//1mS
+
 	LCD_Initial();               //LCD初始化函数
+
 	Times_Pwm_Config(200,499,200); //Backlight PWM
+
   I2CInitMasterMode(I2C1);
 	Lcd_ColorBox(0,0,XSIZE_PHYS,YSIZE_PHYS,Blue);
+
+	Lcd_ColorBox(400,10,50,50,Red);//写红色方块
+	printf(" Welcome to use HJR TK499! \r\n");
+	
+	LCD_PutString(10,60,"Welcome to use HJR TK499 and RGB LCD!",Red,Yellow,1);
+
 	//EXIT_KEY_Init();	//外部模拟LCD中断按键初始化
 	/************/
 	//EXIT_KEY_Init();	//外部模拟LCD中断按键初始化
@@ -88,9 +104,12 @@ RemapVtorTable();
 	lv_init();
 	lv_port_disp_init();
 	lv_port_indev_init();
-	reflow_oven_ui();
+//	reflow_oven_ui();
 //创建启动任务,优先级设为最大,优先级值越大,优先级越大
-	xTaskCreate(Start_Task,                    //任务函数
+
+	lv_demo_widgets();
+
+  xTaskCreate(Start_Task,                    //任务函数
 	            (const char *)"start task",    //任务名
 	            START_TASK_STK_SIZE,    //栈大小
 	            NULL,                        //任务参数
@@ -102,7 +121,7 @@ RemapVtorTable();
 	
 	while(1)
 	{
-	
+		vTaskDelay(500);
 	}
 }
 

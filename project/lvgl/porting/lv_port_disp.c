@@ -27,7 +27,7 @@
  **********************/
 static void disp_init(void);
 
-static void disp_flush(lv_disp_drv_t * disp_drv_f, const lv_area_t * area, lv_color_t * color_p);
+static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 #if LV_USE_GPU
 static void gpu_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 static void gpu_fill(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
@@ -87,23 +87,24 @@ void lv_port_disp_init(void)
 //       lv_disp_buf_init(&disp_buf_2, buf2_1, buf2_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);   /*Initialize the display buffer*/
 
 //    /* Example for 3) */
-//    static lv_disp_buf_t disp_buf_3;
-//		extern __align(256) u32 LTDC_Buf[XSIZE_PHYS*YSIZE_PHYS*2];//XSIZE_PHYS*YSIZE_PHYS*2
-//		#define buf3_1 (uint8_t*)LTDC_Buf
-//    #define buf3_2 (uint8_t*)(LTDC_Buf+XSIZE_PHYS*YSIZE_PHYS)
-//    ///static lv_color_t buf3_1[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*A screen sized buffer*/
-//    ///static lv_color_t buf3_2[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*An other screen sized buffer*/
-//    lv_disp_buf_init(&disp_buf_3, buf3_1, buf3_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);   /*Initialize the display buffer*/
+    static lv_disp_buf_t disp_buf_3;
+		extern __align(256) u32 LTDC_Buf[XSIZE_PHYS*YSIZE_PHYS*2];//XSIZE_PHYS*YSIZE_PHYS*2
+		#define buf3_1 (uint8_t*)LTDC_Buf
+    #define buf3_2 (uint8_t*)(LTDC_Buf+XSIZE_PHYS*YSIZE_PHYS)
+    ///static lv_color_t buf3_1[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*A screen sized buffer*/
+    ///static lv_color_t buf3_2[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*An other screen sized buffer*/
+    lv_disp_buf_init(&disp_buf_3, buf3_1, buf3_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);   /*Initialize the display buffer*/
 
-  static lv_disp_buf_t disp_buf_3;
-  static lv_color_t buf3_1[LV_HOR_RES_MAX * LV_VER_RES_MAX + 1];            /*A screen sized buffer*/
-  static lv_color_t buf3_2[LV_HOR_RES_MAX * LV_VER_RES_MAX + 1];            /*An other screen sized buffer*/
- lv_disp_buf_init(&disp_buf_3, buf3_1, buf3_2, LV_HOR_RES_MAX * LV_VER_RES_MAX + 1);   /*Initialize the display buffer*/
+//  static lv_disp_buf_t disp_buf_3;
+//  static lv_color_t buf3_1[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*A screen sized buffer*/
+//  static lv_color_t buf3_2[LV_HOR_RES_MAX * LV_VER_RES_MAX];            /*An other screen sized buffer*/
+// lv_disp_buf_init(&disp_buf_3, buf3_1, buf3_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);   /*Initialize the display buffer*/
 
     /*-----------------------------------
      * Register the display in LittlevGL
      *----------------------------------*/
 
+    lv_disp_drv_t disp_drv;                         /*Descriptor of a display driver*/
     lv_disp_drv_init(&disp_drv);                    /*Basic initialization*/
 
     /*Set up the functions to access to your display*/
@@ -151,12 +152,15 @@ static void disp_init(void)
 
 void DMA2_Channel2_IRQHandler()
 { 
+//	lv_disp_drv_t * disp_drv;
+	
+	
 	if(DMA_GetITStatus(DMA2_IT_TC2))
 		{
 //			printf(" A");
 			DMA_ClearITPendingBit(DMA2_IT_TC2);
 
-			lv_disp_flush_ready(&disp_drv);
+//			lv_disp_flush_ready(disp_drv);
 		}
 		
 }
@@ -165,7 +169,7 @@ void DMA2_Channel2_IRQHandler()
  * 'lv_disp_flush_ready()' has to be called when finished. */
 //#pragma arm section code ="RAMCODE"
 //#pragma arm section
-static void disp_flush(lv_disp_drv_t * disp_drv_f, const lv_area_t * area, lv_color_t * color_p)
+static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
     /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
 
@@ -174,13 +178,25 @@ static void disp_flush(lv_disp_drv_t * disp_drv_f, const lv_area_t * area, lv_co
 	
 //	LCD_Fill_Pic(area->x1,area->x2,area->y1, area->y2, (u32*)color_p);
 	
-	BlockWrite(area->x1,area->x2,area->y1,area->y2);
-	TK80_DMA_Init((u32)color_p,(area->x2-area->x1+1)*(area->y2-area->y1+1));//DMA初始化
-	while((DMA2->ISR & 0x20)==0);
-	DMA2->IFCR |=1<<5;
+//	BlockWrite(area->x1,area->x2,area->y1,area->y2);
+//	TK80_DMA_Init((u32)color_p,(area->x2-area->x1+1)*(area->y2-area->y1+1));//DMA初始化
+//	while((DMA2->ISR & 0x20)==0);
+//	DMA2->IFCR |=1<<5;
+	
+//    for(y = area->y1; y <= area->y2; y++) {
+//        for(x = area->x1; x <= area->x2; x++) {
+//           /* Put a pixel to the display. For example: */
+//            /* put_px(x, y, *color_p)*/					 
+////					LTDC_Buf[y+YSIZE_PHYS*x] =  (color_p->full);
+//					LTDC_Buf[x+XSIZE_PHYS*y] =  (color_p->full);
 
-  /* Inform the graphics library that you are ready with the flushing*/
-  lv_disp_flush_ready(&disp_drv);
+//            color_p++;
+//       }
+//   }
+
+    /* IMPORTANT!!!
+     * Inform the graphics library that you are ready with the flushing*/
+    lv_disp_flush_ready(disp_drv);
 }
 
 
